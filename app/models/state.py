@@ -36,6 +36,7 @@ class PipelineState(BaseModel):
     run_id: str = ""
     feature_request: str = ""
     technical_blueprint: str = ""
+    technical_contract: Dict[str, Any] | None = None
     current_code: str = ""
     current_test_code: str = ""
     frontend_code: str = ""

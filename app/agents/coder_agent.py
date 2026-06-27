@@ -1,12 +1,15 @@
-import re
+import logging
 
 from app.agents.base import BaseAgent
+from app.agents.code_validator import normalize_backend_code
 from app.agents.prompts import (
     CODER_CORRECTION_SYSTEM_PROMPT,
     CODER_CORRECTION_USER_PROMPT,
     CODER_SYSTEM_PROMPT,
     CODER_USER_PROMPT,
 )
+
+logger = logging.getLogger(__name__)
 
 
 class CoderAgent(BaseAgent):
@@ -47,4 +50,9 @@ class CoderAgent(BaseAgent):
     @staticmethod
     def _normalize_generated_code(code: str) -> str:
         """Apply deterministic compatibility fixes for common generated-code drift."""
-        return re.sub(r"constr\(\s*regex\s*=", "constr(pattern=", code)
+        report = normalize_backend_code(code)
+        for repair in report.repairs:
+            logger.info("Applied generated-code repair: %s", repair)
+        for issue in report.issues:
+            logger.warning("Generated-code validation issue: %s", issue)
+        return report.code

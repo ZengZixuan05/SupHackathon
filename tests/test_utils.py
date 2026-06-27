@@ -1,5 +1,6 @@
 from app.agents.coder_agent import CoderAgent
-from app.agents.utils import extract_html, extract_python_code
+from app.agents.code_validator import find_backend_code_issues, normalize_backend_code
+from app.agents.utils import extract_html, extract_json_object, extract_python_code
 
 
 def test_extract_python_code_from_fenced_block():
@@ -30,3 +31,29 @@ def test_coder_normalizes_pydantic_v2_regex_keyword():
     assert CoderAgent._normalize_generated_code(raw) == (
         "email: constr(pattern=r'^[^@]+@[^@]+$')"
     )
+
+
+def test_extract_json_object_from_fenced_block():
+    raw = "```json\n{\"summary\":\"ok\"}\n```"
+    assert extract_json_object(raw) == '{"summary":"ok"}'
+
+
+def test_backend_validator_repairs_emailstr_and_reports_response_model_dict():
+    code = (
+        "from pydantic import BaseModel, EmailStr\n"
+        "from fastapi import FastAPI\n"
+        "app = FastAPI()\n"
+        "class User(BaseModel):\n"
+        "    email: EmailStr\n"
+        "@app.post('/users', response_model=dict)\n"
+        "def create_user(user: User): return {'email': user.email}\n"
+    )
+    report = normalize_backend_code(code)
+    assert "EmailStr" not in report.code
+    assert any("email-validator" in repair for repair in report.repairs)
+    assert any("response_model=dict" in issue for issue in report.issues)
+
+
+def test_backend_validator_finds_routes_missing_response_model():
+    code = "from fastapi import FastAPI\napp=FastAPI()\n@app.get('/ping')\ndef ping(): return {}"
+    assert find_backend_code_issues(code) == ["Routes missing explicit response_model: GET /ping"]

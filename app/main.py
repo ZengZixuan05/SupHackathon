@@ -35,6 +35,7 @@ class GenerateFeatureResponse(BaseModel):
     run_id: str
     feature_request: str
     technical_blueprint: str
+    technical_contract: Dict[str, Any] | None
     status: PipelineStatus
     active_agent: AgentName | None
     iteration_count: int
@@ -131,6 +132,7 @@ def generate_feature(body: GenerateFeatureRequest) -> GenerateFeatureResponse:
         run_id=state.run_id,
         feature_request=state.feature_request,
         technical_blueprint=state.technical_blueprint,
+        technical_contract=state.technical_contract,
         status=state.status,
         active_agent=state.active_agent,
         iteration_count=state.iteration_count,

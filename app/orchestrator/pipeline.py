@@ -43,11 +43,16 @@ class FeaturePipeline:
 
         # ── Agent 1: PM ──────────────────────────────────────────────
         try:
-            self._record(state, "PM Agent planning technical blueprint")
-            state.technical_blueprint = self._pm.create_blueprint(feature_request)
+            self._record(state, "PM Agent producing structured contract")
+            contract = self._pm.create_contract(feature_request)
+            state.technical_contract = contract.as_dict()
+            state.technical_blueprint = contract.to_prompt_text()
             self._record(
                 state,
-                f"PM Agent produced blueprint ({len(state.technical_blueprint)} chars)",
+                (
+                    "PM Agent produced contract "
+                    f"({len(contract.endpoints)} endpoints, {len(contract.test_cases)} tests)"
+                ),
             )
         except Exception as exc:
             return self._fail(state, f"PM Agent failed: {exc}", AgentName.PM)
@@ -139,7 +144,8 @@ class FeaturePipeline:
             logs = result.combined_logs
             is_test_mismatch = self._looks_like_test_mismatch(logs)
 
-            # Alternate: fix tests when failures look like assertion mismatches, else fix code
+            # Fix tests only when the test suite itself is invalid. Assertion failures preserve
+            # the contract and should be fixed in application code.
             if is_test_mismatch:
                 state.status = PipelineStatus.CORRECTING
                 state.active_agent = AgentName.QA
@@ -177,16 +183,6 @@ class FeaturePipeline:
                     self._record(
                         state,
                         f"Coder Agent corrected app code ({len(state.current_code)} chars)",
-                    )
-                    state.current_test_code = self._qa.sync_tests(
-                        blueprint=blueprint,
-                        feature_request=feature_request,
-                        current_code=state.current_code,
-                        test_logs=logs,
-                    )
-                    self._record(
-                        state,
-                        f"QA Agent synced tests after correction ({len(state.current_test_code)} chars)",
                     )
                 except Exception as exc:
                     state.status = PipelineStatus.FAILED
@@ -307,17 +303,16 @@ class FeaturePipeline:
         return "... truncated ...\n" + text[-max_chars:]
 
     def _looks_like_test_mismatch(self, logs: str) -> bool:
-        """Heuristic: assertion failures on status codes or response shape → fix tests."""
+        """Heuristic: regenerate tests only when the test suite itself is broken."""
         indicators = (
-            "AssertionError",
-            "'error'",
-            "'detail'",
-            "assert 422 ==",
-            "assert 400 ==",
-            "Left contains",
-            "Right contains",
+            "SyntaxError",
+            "IndentationError",
+            "fixture ",
+            "NameError",
+            "ImportError while importing test module",
+            "ModuleNotFoundError: No module named 'pytest'",
         )
-        return any(marker in logs for marker in indicators) and "ResponseValidationError" not in logs
+        return any(marker in logs for marker in indicators) and "sandbox_app.py" not in logs
 
     def _fallback_ui(self, api_base: str) -> str:
         return f"""<!DOCTYPE html>

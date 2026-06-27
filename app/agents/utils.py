@@ -1,6 +1,26 @@
 import re
 
 
+def extract_json_object(raw: str) -> str:
+    """Extract a JSON object from plain text or fenced model output."""
+    text = raw.strip()
+
+    fence_pattern = r"```(?:json)?\s*\n?(.*?)```"
+    matches = re.findall(fence_pattern, text, re.DOTALL | re.IGNORECASE)
+    if matches:
+        text = matches[-1].strip()
+
+    if text.startswith("{") and text.endswith("}"):
+        return text
+
+    start = text.find("{")
+    end = text.rfind("}")
+    if start != -1 and end != -1 and end > start:
+        return text[start : end + 1].strip()
+
+    return text
+
+
 def extract_python_code(raw: str) -> str:
     """Strip markdown fences and surrounding prose from LLM output."""
     text = raw.strip()

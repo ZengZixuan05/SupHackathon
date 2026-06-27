@@ -1,0 +1,48 @@
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel, Field, conint
+from typing import List, Dict
+
+app = FastAPI()
+
+# In-memory storage
+items: Dict[str, dict] = {}
+
+# Pydantic models
+class Item(BaseModel):
+    name: str = Field(..., description="The name of the inventory item.")
+    sku: str = Field(..., description="The unique stock keeping unit identifier.", pattern="^[a-zA-Z0-9-_]+$")
+    quantity: conint(ge=0) = Field(..., description="The quantity of the inventory item in stock.")
+
+class SellRequest(BaseModel):
+    amount: conint(ge=1) = Field(..., description="The amount to decrement from stock.")
+
+# Helper functions
+def get_item(sku: str) -> Item:
+    if sku not in items:
+        raise HTTPException(status_code=404, detail="Item not found")
+    return Item(**items[sku])
+
+# Route handlers
+@app.post("/items", response_model=Item, status_code=201)
+def add_item(item: Item):
+    if item.sku in items:
+        raise HTTPException(status_code=409, detail="SKU must be unique")
+    items[item.sku] = item.dict()
+    return item
+
+@app.get("/items", response_model=List[Item])
+def list_items():
+    return [Item(**item) for item in items.values()]
+
+@app.get("/items/{sku}", response_model=Item)
+def retrieve_item(sku: str):
+    return get_item(sku)
+
+@app.post("/items/{sku}/sell", response_model=Item)
+def sell_item(sku: str, sell_request: SellRequest):
+    item = get_item(sku)
+    if item.quantity < sell_request.amount:
+        raise HTTPException(status_code=400, detail="Insufficient stock")
+    item.quantity -= sell_request.amount
+    items[sku] = item.dict()
+    return item

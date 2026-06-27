@@ -1,0 +1,68 @@
+import pytest
+from fastapi.testclient import TestClient
+from sandbox_app import app
+
+client = TestClient(app)
+
+@pytest.fixture(autouse=True)
+def clear_stores():
+    import sandbox_app
+    for name, value in vars(sandbox_app).items():
+        if not name.startswith("_") and isinstance(value, (dict, list, set)):
+            value.clear()
+    yield
+    for name, value in vars(sandbox_app).items():
+        if not name.startswith("_") and isinstance(value, (dict, list, set)):
+            value.clear()
+
+def test_add_item():
+    response = client.post("/items", json={"name": "Widget", "sku": "WDG-001", "quantity": 100})
+    assert response.status_code == 201
+    data = response.json()
+    assert "name" in data
+    assert "sku" in data
+    assert "quantity" in data
+    assert data["name"] == "Widget"
+    assert data["sku"] == "WDG-001"
+    assert data["quantity"] == 100
+
+def test_get_item():
+    client.post("/items", json={"name": "Widget", "sku": "WDG-001", "quantity": 100})
+    response = client.get("/items/WDG-001")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["name"] == "Widget"
+    assert data["sku"] == "WDG-001"
+    assert data["quantity"] == 100
+
+def test_sell_item():
+    client.post("/items", json={"name": "Widget", "sku": "WDG-001", "quantity": 100})
+    response = client.post("/items/WDG-001/sell", json={"amount": 30})
+    assert response.status_code == 200
+    data = response.json()
+    assert data["quantity"] == 70
+
+def test_sell_insufficient_stock():
+    client.post("/items", json={"name": "Widget", "sku": "WDG-001", "quantity": 10})
+    response = client.post("/items/WDG-001/sell", json={"amount": 15})
+    assert response.status_code == 400
+    assert "detail" in response.json()
+
+def test_add_duplicate_item():
+    client.post("/items", json={"name": "Widget", "sku": "WDG-001", "quantity": 100})
+    response = client.post("/items", json={"name": "Gadget", "sku": "WDG-001", "quantity": 50})
+    assert response.status_code == 409
+
+def test_get_all_items():
+    client.post("/items", json={"name": "Widget", "sku": "WDG-001", "quantity": 100})
+    client.post("/items", json={"name": "Gadget", "sku": "GDT-002", "quantity": 50})
+    response = client.get("/items")
+    assert response.status_code == 200
+    data = response.json()
+    assert isinstance(data, list)
+    assert len(data) == 2
+
+def test_get_nonexistent_item():
+    response = client.get("/items/INVALID-SKU")
+    assert response.status_code == 404
+    assert "detail" in response.json()
