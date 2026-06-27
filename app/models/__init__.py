@@ -1,3 +1,3 @@
-from app.models.state import AttemptRecord, PipelineState, PipelineStatus
+from app.models.state import AgentName, AttemptRecord, PipelineState, PipelineStatus
 
-__all__ = ["AttemptRecord", "PipelineState", "PipelineStatus"]
+__all__ = ["AgentName", "AttemptRecord", "PipelineState", "PipelineStatus"]

@@ -19,3 +19,26 @@ def extract_python_code(raw: str) -> str:
         return "\n".join(lines).strip()
 
     return text
+
+
+def extract_html(raw: str) -> str:
+    """Strip markdown fences from HTML output."""
+    text = raw.strip()
+
+    fence_pattern = r"```(?:html)?\s*\n?(.*?)```"
+    matches = re.findall(fence_pattern, text, re.DOTALL | re.IGNORECASE)
+    if matches:
+        return matches[-1].strip()
+
+    if text.startswith("<!") or text.startswith("<html"):
+        return text
+
+    if text.startswith("```"):
+        lines = text.splitlines()
+        if lines[0].startswith("```"):
+            lines = lines[1:]
+        if lines and lines[-1].strip() == "```":
+            lines = lines[:-1]
+        return "\n".join(lines).strip()
+
+    return text
