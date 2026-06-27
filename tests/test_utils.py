@@ -1,3 +1,4 @@
+from app.agents.coder_agent import CoderAgent
 from app.agents.utils import extract_html, extract_python_code
 
 
@@ -22,3 +23,10 @@ def test_extract_html_from_fenced_block():
 def test_extract_html_plain():
     raw = "<!DOCTYPE html><html><body>Hi</body></html>"
     assert extract_html(raw) == raw
+
+
+def test_coder_normalizes_pydantic_v2_regex_keyword():
+    raw = "email: constr(regex=r'^[^@]+@[^@]+$')"
+    assert CoderAgent._normalize_generated_code(raw) == (
+        "email: constr(pattern=r'^[^@]+@[^@]+$')"
+    )

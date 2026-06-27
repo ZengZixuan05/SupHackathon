@@ -58,8 +58,8 @@ def save_artifacts(
 ) -> Path:
     workspace = settings.generated_dir / run_id
     workspace.mkdir(parents=True, exist_ok=True)
-    (workspace / "sandbox_app.py").write_text(backend_code, encoding="utf-8")
-    (workspace / "test_sandbox.py").write_text(test_code, encoding="utf-8")
+    (workspace / "sandbox_app.py.txt").write_text(backend_code, encoding="utf-8")
+    (workspace / "test_sandbox.py.txt").write_text(test_code, encoding="utf-8")
     if frontend_html:
         (workspace / "ui.html").write_text(frontend_html, encoding="utf-8")
     return workspace

@@ -1,0 +1,694 @@
+=== STDOUT ===
+============================= test session starts =============================
+platform win32 -- Python 3.11.8, pytest-9.0.2, pluggy-1.6.0 -- C:\Program Files\Python311\python.exe
+rootdir: C:\Users\alson\AppData\Local\Temp\feature_pipeline_g6zq8y93
+plugins: anyio-4.13.0, asyncio-1.3.0, cov-7.1.0, mock-3.15.1
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 10 items
+
+test_sandbox.py::test_add_item_success FAILED                            [ 10%]
+test_sandbox.py::test_add_item_duplicate_sku FAILED                      [ 20%]
+test_sandbox.py::test_list_items FAILED                                  [ 30%]
+test_sandbox.py::test_get_item_success FAILED                            [ 40%]
+test_sandbox.py::test_get_item_not_found PASSED                          [ 50%]
+test_sandbox.py::test_sell_item_success FAILED                           [ 60%]
+test_sandbox.py::test_sell_item_insufficient_stock FAILED                [ 70%]
+test_sandbox.py::test_sell_item_not_found PASSED                         [ 80%]
+test_sandbox.py::test_add_item_negative_quantity PASSED                  [ 90%]
+test_sandbox.py::test_sell_item_negative_amount 
+
+================================== FAILURES ===================================
+____________________________ test_add_item_success ____________________________
+test_sandbox.py:17: in test_add_item_success
+    response = client.post("/items", json={"name": "Widget", "sku": "TEST-001", "quantity": 100})
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\Roaming\Python\Python311\site-packages\starlette\testclient.py:546: in post
+    return super().post(
+..\..\..\Roaming\Python\Python311\site-packages\httpx\_client.py:1144: in post
+    return self.request(
+..\..\..\Roaming\Python\Python311\site-packages\starlette\testclient.py:445: in request
+    return super().request(
+..\..\..\Roaming\Python\Python311\site-packages\httpx\_client.py:825: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\Roaming\Python\Python311\site-packages\httpx\_client.py:914: in send
+    response = self._send_handling_auth(
+..\..\..\Roaming\Python\Python311\site-packages\httpx\_client.py:942: in _send_handling_auth
+    response = self._send_handling_redirects(
+..\..\..\Roaming\Python\Python311\site-packages\httpx\_client.py:979: in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\Roaming\Python\Python311\site-packages\httpx\_client.py:1014: in _send_single_request
+    response = transport.handle_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\Roaming\Python\Python311\site-packages\starlette\testclient.py:348: in handle_request
+    raise exc
+..\..\..\Roaming\Python\Python311\site-packages\starlette\testclient.py:345: in handle_request
+    portal.call(self.app, scope, receive, send)
+..\..\..\Roaming\Python\Python311\site-packages\anyio\from_thread.py:334: in call
+    return cast(T_Retval, self.start_task_soon(func, *args).result())
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Program Files\Python311\Lib\concurrent\futures\_base.py:456: in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+C:\Program Files\Python311\Lib\concurrent\futures\_base.py:401: in __get_result
+    raise self._exception
+..\..\..\Roaming\Python\Python311\site-packages\anyio\from_thread.py:259: in _call_func
+    retval = await retval_or_awaitable
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\Roaming\Python\Python311\site-packages\fastapi\applications.py:1159: in __call__
+    await super().__call__(scope, receive, send)
+..\..\..\Roaming\Python\Python311\site-packages\starlette\applications.py:90: in __call__
+    await self.middleware_stack(scope, receive, send)
+..\..\..\Roaming\Python\Python311\site-packages\starlette\middleware\errors.py:186: in __call__
+    raise exc
+..\..\..\Roaming\Python\Python311\site-packages\starlette\middleware\errors.py:164: in __call__
+    await self.app(scope, receive, _send)
+..\..\..\Roaming\Python\Python311\site-packages\starlette\middleware\exceptions.py:63: in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+..\..\..\Roaming\Python\Python311\site-packages\starlette\_exception_handler.py:53: in wrapped_app
+    raise exc
+..\..\..\Roaming\Python\Python311\site-packages\starlette\_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+..\..\..\Roaming\Python\Python311\site-packages\fastapi\middleware\asyncexitstack.py:18: in __call__
+    await self.app(scope, receive, send)
+..\..\..\Roaming\Python\Python311\site-packages\starlette\routing.py:660: in __call__
+    await self.middleware_stack(scope, receive, send)
+..\..\..\Roaming\Python\Python311\site-packages\starlette\routing.py:680: in app
+    await route.handle(scope, receive, send)
+..\..\..\Roaming\Python\Python311\site-packages\starlette\routing.py:276: in handle
+    await self.app(scope, receive, send)
+..\..\..\Roaming\Python\Python311\site-packages\fastapi\routing.py:134: in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+..\..\..\Roaming\Python\Python311\site-packages\starlette\_exception_handler.py:53: in wrapped_app
+    raise exc
+..\..\..\Roaming\Python\Python311\site-packages\starlette\_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+..\..\..\Roaming\Python\Python311\site-packages\fastapi\routing.py:120: in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+..\..\..\Roaming\Python\Python311\site-packages\fastapi\routing.py:695: in app
+    content = await serialize_response(
+..\..\..\Roaming\Python\Python311\site-packages\fastapi\routing.py:300: in serialize_response
+    raise ResponseValidationError(
+E   fastapi.exceptions.ResponseValidationError: 1 validation error:
+E     {'type': 'model_attributes_type', 'loc': ('response', 'message'), 'msg': 'Input should be a valid dictionary or object to extract fields from', 'input': 'Item added successfully'}
+E   
+E     File "C:\Users\alson\AppData\Local\Temp\feature_pipeline_g6zq8y93\sandbox_app.py", line 21, in add_item
+E       POST /items
+_________________________ test_add_item_duplicate_sku _________________________
+test_sandbox.py:27: in test_add_item_duplicate_sku
+    client.post("/items", json={"name": "Widget", "sku": "TEST-001", "quantity": 100})
+..\..\..\Roaming\Python\Python311\site-packages\starlette\testclient.py:546: in post
+    return super().post(
+..\..\..\Roaming\Python\Python311\site-packages\httpx\_client.py:1144: in post
+    return self.request(
+..\..\..\Roaming\Python\Python311\site-packages\starlette\testclient.py:445: in request
+    return super().request(
+..\..\..\Roaming\Python\Python311\site-packages\httpx\_client.py:825: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\Roaming\Python\Python311\site-packages\httpx\_client.py:914: in send
+    response = self._send_handling_auth(
+..\..\..\Roaming\Python\Python311\site-packages\httpx\_client.py:942: in _send_handling_auth
+    response = self._send_handling_redirects(
+..\..\..\Roaming\Python\Python311\site-packages\httpx\_client.py:979: in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\Roaming\Python\Python311\site-packages\httpx\_client.py:1014: in _send_single_request
+    response = transport.handle_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\Roaming\Python\Python311\site-packages\starlette\testclient.py:348: in handle_request
+    raise exc
+..\..\..\Roaming\Python\Python311\site-packages\starlette\testclient.py:345: in handle_request
+    portal.call(self.app, scope, receive, send)
+..\..\..\Roaming\Python\Python311\site-packages\anyio\from_thread.py:334: in call
+    return cast(T_Retval, self.start_task_soon(func, *args).result())
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Program Files\Python311\Lib\concurrent\futures\_base.py:456: in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+C:\Program Files\Python311\Lib\concurrent\futures\_base.py:401: in __get_result
+    raise self._exception
+..\..\..\Roaming\Python\Python311\site-packages\anyio\from_thread.py:259: in _call_func
+    retval = await retval_or_awaitable
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\Roaming\Python\Python311\site-packages\fastapi\applications.py:1159: in __call__
+    await super().__call__(scope, receive, send)
+..\..\..\Roaming\Python\Python311\site-packages\starlette\applications.py:90: in __call__
+    await self.middleware_stack(scope, receive, send)
+..\..\..\Roaming\Python\Python311\site-packages\starlette\middleware\errors.py:186: in __call__
+    raise exc
+..\..\..\Roaming\Python\Python311\site-packages\starlette\middleware\errors.py:164: in __call__
+    await self.app(scope, receive, _send)
+..\..\..\Roaming\Python\Python311\site-packages\starlette\middleware\exceptions.py:63: in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+..\..\..\Roaming\Python\Python311\site-packages\starlette\_exception_handler.py:53: in wrapped_app
+    raise exc
+..\..\..\Roaming\Python\Python311\site-packages\starlette\_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+..\..\..\Roaming\Python\Python311\site-packages\fastapi\middleware\asyncexitstack.py:18: in __call__
+    await self.app(scope, receive, send)
+..\..\..\Roaming\Python\Python311\site-packages\starlette\routing.py:660: in __call__
+    await self.middleware_stack(scope, receive, send)
+..\..\..\Roaming\Python\Python311\site-packages\starlette\routing.py:680: in app
+    await route.handle(scope, receive, send)
+..\..\..\Roaming\Python\Python311\site-packages\starlette\routing.py:276: in handle
+    await self.app(scope, receive, send)
+..\..\..\Roaming\Python\Python311\site-packages\fastapi\routing.py:134: in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+..\..\..\Roaming\Python\Python311\site-packages\starlette\_exception_handler.py:53: in wrapped_app
+    raise exc
+..\..\..\Roaming\Python\Python311\site-packages\starlette\_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+..\..\..\Roaming\Python\Python311\site-packages\fastapi\routing.py:120: in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+..\..\..\Roaming\Python\Python311\site-packages\fastapi\routing.py:695: in app
+    content = await serialize_response(
+..\..\..\Roaming\Python\Python311\site-packages\fastapi\routing.py:300: in serialize_response
+    raise ResponseValidationError(
+E   fastapi.exceptions.ResponseValidationError: 1 validation error:
+E     {'type': 'model_attributes_type', 'loc': ('response', 'message'), 'msg': 'Input should be a valid dictionary or object to extract fields from', 'input': 'Item added successfully'}
+E   
+E     File "C:\Users\alson\AppData\Local\Temp\feature_pipeline_g6zq8y93\sandbox_app.py", line 21, in add_item
+E       POST /items
+_______________________________ test_list_items _______________________________
+test_sandbox.py:33: in test_list_items
+    client.post("/items", json={"name": "Widget", "sku": "TEST-001", "quantity": 100})
+..\..\..\Roaming\Python\Python311\site-packages\starlette\testclient.py:546: in post
+    return super().post(
+..\..\..\Roaming\Python\Python311\site-packages\httpx\_client.py:1144: in post
+    return self.request(
+..\..\..\Roaming\Python\Python311\site-packages\starlette\testclient.py:445: in request
+    return super().request(
+..\..\..\Roaming\Python\Python311\site-packages\httpx\_client.py:825: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\Roaming\Python\Python311\site-packages\httpx\_client.py:914: in send
+    response = self._send_handling_auth(
+..\..\..\Roaming\Python\Python311\site-packages\httpx\_client.py:942: in _send_handling_auth
+    response = self._send_handling_redirects(
+..\..\..\Roaming\Python\Python311\site-packages\httpx\_client.py:979: in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\Roaming\Python\Python311\site-packages\httpx\_client.py:1014: in _send_single_request
+    response = transport.handle_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\Roaming\Python\Python311\site-packages\starlette\testclient.py:348: in handle_request
+    raise exc
+..\..\..\Roaming\Python\Python311\site-packages\starlette\testclient.py:345: in handle_request
+    portal.call(self.app, scope, receive, send)
+..\..\..\Roaming\Python\Python311\site-packages\anyio\from_thread.py:334: in call
+    return cast(T_Retval, self.start_task_soon(func, *args).result())
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Program Files\Python311\Lib\concurrent\futures\_base.py:456: in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+C:\Program Files\Python311\Lib\concurrent\futures\_base.py:401: in __get_result
+    raise self._exception
+..\..\..\Roaming\Python\Python311\site-packages\anyio\from_thread.py:259: in _call_func
+    retval = await retval_or_awaitable
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\Roaming\Python\Python311\site-packages\fastapi\applications.py:1159: in __call__
+    await super().__call__(scope, receive, send)
+..\..\..\Roaming\Python\Python311\site-packages\starlette\applications.py:90: in __call__
+    await self.middleware_stack(scope, receive, send)
+..\..\..\Roaming\Python\Python311\site-packages\starlette\middleware\errors.py:186: in __call__
+    raise exc
+..\..\..\Roaming\Python\Python311\site-packages\starlette\middleware\errors.py:164: in __call__
+    await self.app(scope, receive, _send)
+..\..\..\Roaming\Python\Python311\site-packages\starlette\middleware\exceptions.py:63: in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+..\..\..\Roaming\Python\Python311\site-packages\starlette\_exception_handler.py:53: in wrapped_app
+    raise exc
+..\..\..\Roaming\Python\Python311\site-packages\starlette\_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+..\..\..\Roaming\Python\Python311\site-packages\fastapi\middleware\asyncexitstack.py:18: in __call__
+    await self.app(scope, receive, send)
+..\..\..\Roaming\Python\Python311\site-packages\starlette\routing.py:660: in __call__
+    await self.middleware_stack(scope, receive, send)
+..\..\..\Roaming\Python\Python311\site-packages\starlette\routing.py:680: in app
+    await route.handle(scope, receive, send)
+..\..\..\Roaming\Python\Python311\site-packages\starlette\routing.py:276: in handle
+    await self.app(scope, receive, send)
+..\..\..\Roaming\Python\Python311\site-packages\fastapi\routing.py:134: in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+..\..\..\Roaming\Python\Python311\site-packages\starlette\_exception_handler.py:53: in wrapped_app
+    raise exc
+..\..\..\Roaming\Python\Python311\site-packages\starlette\_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+..\..\..\Roaming\Python\Python311\site-packages\fastapi\routing.py:120: in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+..\..\..\Roaming\Python\Python311\site-packages\fastapi\routing.py:695: in app
+    content = await serialize_response(
+..\..\..\Roaming\Python\Python311\site-packages\fastapi\routing.py:300: in serialize_response
+    raise ResponseValidationError(
+E   fastapi.exceptions.ResponseValidationError: 1 validation error:
+E     {'type': 'model_attributes_type', 'loc': ('response', 'message'), 'msg': 'Input should be a valid dictionary or object to extract fields from', 'input': 'Item added successfully'}
+E   
+E     File "C:\Users\alson\AppData\Local\Temp\feature_pipeline_g6zq8y93\sandbox_app.py", line 21, in add_item
+E       POST /items
+____________________________ test_get_item_success ____________________________
+test_sandbox.py:42: in test_get_item_success
+    client.post("/items", json={"name": "Widget", "sku": "TEST-001", "quantity": 100})
+..\..\..\Roaming\Python\Python311\site-packages\starlette\testclient.py:546: in post
+    return super().post(
+..\..\..\Roaming\Python\Python311\site-packages\httpx\_client.py:1144: in post
+    return self.request(
+..\..\..\Roaming\Python\Python311\site-packages\starlette\testclient.py:445: in request
+    return super().request(
+..\..\..\Roaming\Python\Python311\site-packages\httpx\_client.py:825: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\Roaming\Python\Python311\site-packages\httpx\_client.py:914: in send
+    response = self._send_handling_auth(
+..\..\..\Roaming\Python\Python311\site-packages\httpx\_client.py:942: in _send_handling_auth
+    response = self._send_handling_redirects(
+..\..\..\Roaming\Python\Python311\site-packages\httpx\_client.py:979: in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\Roaming\Python\Python311\site-packages\httpx\_client.py:1014: in _send_single_request
+    response = transport.handle_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\Roaming\Python\Python311\site-packages\starlette\testclient.py:348: in handle_request
+    raise exc
+..\..\..\Roaming\Python\Python311\site-packages\starlette\testclient.py:345: in handle_request
+    portal.call(self.app, scope, receive, send)
+..\..\..\Roaming\Python\Python311\site-packages\anyio\from_thread.py:334: in call
+    return cast(T_Retval, self.start_task_soon(func, *args).result())
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Program Files\Python311\Lib\concurrent\futures\_base.py:456: in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+C:\Program Files\Python311\Lib\concurrent\futures\_base.py:401: in __get_result
+    raise self._exception
+..\..\..\Roaming\Python\Python311\site-packages\anyio\from_thread.py:259: in _call_func
+    retval = await retval_or_awaitable
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\Roaming\Python\Python311\site-packages\fastapi\applications.py:1159: in __call__
+    await super().__call__(scope, receive, send)
+..\..\..\Roaming\Python\Python311\site-packages\starlette\applications.py:90: in __call__
+    await self.middleware_stack(scope, receive, send)
+..\..\..\Roaming\Python\Python311\site-packages\starlette\middleware\errors.py:186: in __call__
+    raise exc
+..\..\..\Roaming\Python\Python311\site-packages\starlette\middleware\errors.py:164: in __call__
+    await self.app(scope, receive, _send)
+..\..\..\Roaming\Python\Python311\site-packages\starlette\middleware\exceptions.py:63: in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+..\..\..\Roaming\Python\Python311\site-packages\starlette\_exception_handler.py:53: in wrapped_app
+    raise exc
+..\..\..\Roaming\Python\Python311\site-packages\starlette\_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+..\..\..\Roaming\Python\Python311\site-packages\fastapi\middleware\asyncexitstack.py:18: in __call__
+    await self.app(scope, receive, send)
+..\..\..\Roaming\Python\Python311\site-packages\starlette\routing.py:660: in __call__
+    await self.middleware_stack(scope, receive, send)
+..\..\..\Roaming\Python\Python311\site-packages\starlette\routing.py:680: in app
+    await route.handle(scope, receive, send)
+..\..\..\Roaming\Python\Python311\site-packages\starlette\routing.py:276: in handle
+    await self.app(scope, receive, send)
+..\..\..\Roaming\Python\Python311\site-packages\fastapi\routing.py:134: in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+..\..\..\Roaming\Python\Python311\site-packages\starlette\_exception_handler.py:53: in wrapped_app
+    raise exc
+..\..\..\Roaming\Python\Python311\site-packages\starlette\_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+..\..\..\Roaming\Python\Python311\site-packages\fastapi\routing.py:120: in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+..\..\..\Roaming\Python\Python311\site-packages\fastapi\routing.py:695: in app
+    content = await serialize_response(
+..\..\..\Roaming\Python\Python311\site-packages\fastapi\routing.py:300: in serialize_response
+    raise ResponseValidationError(
+E   fastapi.exceptions.ResponseValidationError: 1 validation error:
+E     {'type': 'model_attributes_type', 'loc': ('response', 'message'), 'msg': 'Input should be a valid dictionary or object to extract fields from', 'input': 'Item added successfully'}
+E   
+E     File "C:\Users\alson\AppData\Local\Temp\feature_pipeline_g6zq8y93\sandbox_app.py", line 21, in add_item
+E       POST /items
+___________________________ test_sell_item_success ____________________________
+test_sandbox.py:56: in test_sell_item_success
+    client.post("/items", json={"name": "Widget", "sku": "TEST-001", "quantity": 100})
+..\..\..\Roaming\Python\Python311\site-packages\starlette\testclient.py:546: in post
+    return super().post(
+..\..\..\Roaming\Python\Python311\site-packages\httpx\_client.py:1144: in post
+    return self.request(
+..\..\..\Roaming\Python\Python311\site-packages\starlette\testclient.py:445: in request
+    return super().request(
+..\..\..\Roaming\Python\Python311\site-packages\httpx\_client.py:825: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\Roaming\Python\Python311\site-packages\httpx\_client.py:914: in send
+    response = self._send_handling_auth(
+..\..\..\Roaming\Python\Python311\site-packages\httpx\_client.py:942: in _send_handling_auth
+    response = self._send_handling_redirects(
+..\..\..\Roaming\Python\Python311\site-packages\httpx\_client.py:979: in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\Roaming\Python\Python311\site-packages\httpx\_client.py:1014: in _send_single_request
+    response = transport.handle_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\Roaming\Python\Python311\site-packages\starlette\testclient.py:348: in handle_request
+    raise exc
+..\..\..\Roaming\Python\Python311\site-packages\starlette\testclient.py:345: in handle_request
+    portal.call(self.app, scope, receive, send)
+..\..\..\Roaming\Python\Python311\site-packages\anyio\from_thread.py:334: in call
+    return cast(T_Retval, self.start_task_soon(func, *args).result())
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Program Files\Python311\Lib\concurrent\futures\_base.py:456: in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+C:\Program Files\Python311\Lib\concurrent\futures\_base.py:401: in __get_result
+    raise self._exception
+..\..\..\Roaming\Python\Python311\site-packages\anyio\from_thread.py:259: in _call_func
+    retval = await retval_or_awaitable
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\Roaming\Python\Python311\site-packages\fastapi\applications.py:1159: in __call__
+    await super().__call__(scope, receive, send)
+..\..\..\Roaming\Python\Python311\site-packages\starlette\applications.py:90: in __call__
+    await self.middleware_stack(scope, receive, send)
+..\..\..\Roaming\Python\Python311\site-packages\starlette\middleware\errors.py:186: in __call__
+    raise exc
+..\..\..\Roaming\Python\Python311\site-packages\starlette\middleware\errors.py:164: in __call__
+    await self.app(scope, receive, _send)
+..\..\..\Roaming\Python\Python311\site-packages\starlette\middleware\exceptions.py:63: in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+..\..\..\Roaming\Python\Python311\site-packages\starlette\_exception_handler.py:53: in wrapped_app
+    raise exc
+..\..\..\Roaming\Python\Python311\site-packages\starlette\_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+..\..\..\Roaming\Python\Python311\site-packages\fastapi\middleware\asyncexitstack.py:18: in __call__
+    await self.app(scope, receive, send)
+..\..\..\Roaming\Python\Python311\site-packages\starlette\routing.py:660: in __call__
+    await self.middleware_stack(scope, receive, send)
+..\..\..\Roaming\Python\Python311\site-packages\starlette\routing.py:680: in app
+    await route.handle(scope, receive, send)
+..\..\..\Roaming\Python\Python311\site-packages\starlette\routing.py:276: in handle
+    await self.app(scope, receive, send)
+..\..\..\Roaming\Python\Python311\site-packages\fastapi\routing.py:134: in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+..\..\..\Roaming\Python\Python311\site-packages\starlette\_exception_handler.py:53: in wrapped_app
+    raise exc
+..\..\..\Roaming\Python\Python311\site-packages\starlette\_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+..\..\..\Roaming\Python\Python311\site-packages\fastapi\routing.py:120: in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+..\..\..\Roaming\Python\Python311\site-packages\fastapi\routing.py:695: in app
+    content = await serialize_response(
+..\..\..\Roaming\Python\Python311\site-packages\fastapi\routing.py:300: in serialize_response
+    raise ResponseValidationError(
+E   fastapi.exceptions.ResponseValidationError: 1 validation error:
+E     {'type': 'model_attributes_type', 'loc': ('response', 'message'), 'msg': 'Input should be a valid dictionary or object to extract fields from', 'input': 'Item added successfully'}
+E   
+E     File "C:\Users\alson\AppData\Local\Temp\feature_pipeline_g6zq8y93\sandbox_app.py", line 21, in add_item
+E       POST /items
+______________________ test_sell_item_insufficient_stock ______________________
+test_sandbox.py:63: in test_sell_item_insufficient_stock
+    client.post("/items", json={"name": "Widget", "sku": "TEST-001", "quantity": 10})
+..\..\..\Roaming\Python\Python311\site-packages\starlette\testclient.py:546: in post
+    return super().post(
+..\..\..\Roaming\Python\Python311\site-packages\httpx\_client.py:1144: in post
+    return self.request(
+..\..\..\Roaming\Python\Python311\site-packages\starlette\testclient.py:445: in request
+    return super().request(
+..\..\..\Roaming\Python\Python311\site-packages\httpx\_client.py:825: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\Roaming\Python\Python311\site-packages\httpx\_client.py:914: in send
+    response = self._send_handling_auth(
+..\..\..\Roaming\Python\Python311\site-packages\httpx\_client.py:942: in _send_handling_auth
+    response = self._send_handling_redirects(
+..\..\..\Roaming\Python\Python311\site-packages\httpx\_client.py:979: in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\Roaming\Python\Python311\site-packages\httpx\_client.py:1014: in _send_single_request
+    response = transport.handle_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\Roaming\Python\Python311\site-packages\starlette\testclient.py:348: in handle_request
+    raise exc
+..\..\..\Roaming\Python\Python311\site-packages\starlette\testclient.py:345: in handle_request
+    portal.call(self.app, scope, receive, send)
+..\..\..\Roaming\Python\Python311\site-packages\anyio\from_thread.py:334: in call
+    return cast(T_Retval, self.start_task_soon(func, *args).result())
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Program Files\Python311\Lib\concurrent\futures\_base.py:456: in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+C:\Program Files\Python311\Lib\concurrent\futures\_base.py:401: in __get_result
+    raise self._exception
+..\..\..\Roaming\Python\Python311\site-packages\anyio\from_thread.py:259: in _call_func
+    retval = await retval_or_awaitable
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\Roaming\Python\Python311\site-packages\fastapi\applications.py:1159: in __call__
+    await super().__call__(scope, receive, send)
+..\..\..\Roaming\Python\Python311\site-packages\starlette\applications.py:90: in __call__
+    await self.middleware_stack(scope, receive, send)
+..\..\..\Roaming\Python\Python311\site-packages\starlette\middleware\errors.py:186: in __call__
+    raise exc
+..\..\..\Roaming\Python\Python311\site-packages\starlette\middleware\errors.py:164: in __call__
+    await self.app(scope, receive, _send)
+..\..\..\Roaming\Python\Python311\site-packages\starlette\middleware\exceptions.py:63: in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+..\..\..\Roaming\Python\Python311\site-packages\starlette\_exception_handler.py:53: in wrapped_app
+    raise exc
+..\..\..\Roaming\Python\Python311\site-packages\starlette\_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+..\..\..\Roaming\Python\Python311\site-packages\fastapi\middleware\asyncexitstack.py:18: in __call__
+    await self.app(scope, receive, send)
+..\..\..\Roaming\Python\Python311\site-packages\starlette\routing.py:660: in __call__
+    await self.middleware_stack(scope, receive, send)
+..\..\..\Roaming\Python\Python311\site-packages\starlette\routing.py:680: in app
+    await route.handle(scope, receive, send)
+..\..\..\Roaming\Python\Python311\site-packages\starlette\routing.py:276: in handle
+    await self.app(scope, receive, send)
+..\..\..\Roaming\Python\Python311\site-packages\fastapi\routing.py:134: in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+..\..\..\Roaming\Python\Python311\site-packages\starlette\_exception_handler.py:53: in wrapped_app
+    raise exc
+..\..\..\Roaming\Python\Python311\site-packages\starlette\_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+..\..\..\Roaming\Python\Python311\site-packages\fastapi\routing.py:120: in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+..\..\..\Roaming\Python\Python311\site-packages\fastapi\routing.py:695: in app
+    content = await serialize_response(
+..\..\..\Roaming\Python\Python311\site-packages\fastapi\routing.py:300: in serialize_response
+    raise ResponseValidationError(
+E   fastapi.exceptions.ResponseValidationError: 1 validation error:
+E     {'type': 'model_attributes_type', 'loc': ('response', 'message'), 'msg': 'Input should be a valid dictionary or object to extract fields from', 'input': 'Item added successfully'}
+E   
+E     File "C:\Users\alson\AppData\Local\Temp\feature_pipeline_g6zq8y93\sandbox_app.py", line 21, in add_item
+E       POST /items
+=========================== short test summary info ===========================
+FAILED test_sandbox.py::test_add_item_success - fastapi.exceptions.ResponseVa...
+FAILED test_sandbox.py::test_add_item_duplicate_sku - fastapi.exceptions.Resp...
+FAILED test_sandbox.py::test_list_items - fastapi.exceptions.ResponseValidati...
+FAILED test_sandbox.py::test_get_item_success - fastapi.exceptions.ResponseVa...
+FAILED test_sandbox.py::test_sell_item_success - fastapi.exceptions.ResponseV...
+FAILED test_sandbox.py::test_sell_item_insufficient_stock - fastapi.exception...
+========================= 6 failed, 3 passed in 1.46s =========================
+
+=== STDERR ===
+Traceback (most recent call last):
+  File "C:\Users\alson\AppData\Roaming\Python\Python311\site-packages\_pytest\main.py", line 318, in wrap_session
+    session.exitstatus = doit(config, session) or 0
+                         ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\alson\AppData\Roaming\Python\Python311\site-packages\_pytest\main.py", line 372, in _main
+    config.hook.pytest_runtestloop(session=session)
+  File "C:\Users\alson\AppData\Roaming\Python\Python311\site-packages\pluggy\_hooks.py", line 512, in __call__
+    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\alson\AppData\Roaming\Python\Python311\site-packages\pluggy\_manager.py", line 120, in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\alson\AppData\Roaming\Python\Python311\site-packages\pluggy\_callers.py", line 167, in _multicall
+    raise exception
+  File "C:\Users\alson\AppData\Roaming\Python\Python311\site-packages\pluggy\_callers.py", line 139, in _multicall
+    teardown.throw(exception)
+  File "C:\Users\alson\AppData\Roaming\Python\Python311\site-packages\_pytest\logging.py", line 801, in pytest_runtestloop
+    return (yield)  # Run all the tests.
+            ^^^^^
+  File "C:\Users\alson\AppData\Roaming\Python\Python311\site-packages\pluggy\_callers.py", line 139, in _multicall
+    teardown.throw(exception)
+  File "C:\Users\alson\AppData\Roaming\Python\Python311\site-packages\_pytest\terminal.py", line 707, in pytest_runtestloop
+    result = yield
+             ^^^^^
+  File "C:\Users\alson\AppData\Roaming\Python\Python311\site-packages\pluggy\_callers.py", line 121, in _multicall
+    res = hook_impl.function(*args)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\alson\AppData\Roaming\Python\Python311\site-packages\_pytest\main.py", line 396, in pytest_runtestloop
+    item.config.hook.pytest_runtest_protocol(item=item, nextitem=nextitem)
+  File "C:\Users\alson\AppData\Roaming\Python\Python311\site-packages\pluggy\_hooks.py", line 512, in __call__
+    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\alson\AppData\Roaming\Python\Python311\site-packages\pluggy\_manager.py", line 120, in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\alson\AppData\Roaming\Python\Python311\site-packages\pluggy\_callers.py", line 167, in _multicall
+    raise exception
+  File "C:\Users\alson\AppData\Roaming\Python\Python311\site-packages\pluggy\_callers.py", line 139, in _multicall
+    teardown.throw(exception)
+  File "C:\Users\alson\AppData\Roaming\Python\Python311\site-packages\_pytest\warnings.py", line 89, in pytest_runtest_protocol
+    return (yield)
+            ^^^^^
+  File "C:\Users\alson\AppData\Roaming\Python\Python311\site-packages\pluggy\_callers.py", line 139, in _multicall
+    teardown.throw(exception)
+  File "C:\Users\alson\AppData\Roaming\Python\Python311\site-packages\_pytest\assertion\__init__.py", line 192, in pytest_runtest_protocol
+    return (yield)
+            ^^^^^
+  File "C:\Users\alson\AppData\Roaming\Python\Python311\site-packages\pluggy\_callers.py", line 139, in _multicall
+    teardown.throw(exception)
+  File "C:\Users\alson\AppData\Roaming\Python\Python311\site-packages\_pytest\unittest.py", line 587, in pytest_runtest_protocol
+    return (yield)
+            ^^^^^
+  File "C:\Users\alson\AppData\Roaming\Python\Python311\site-packages\pluggy\_callers.py", line 139, in _multicall
+    teardown.throw(exception)
+  File "C:\Users\alson\AppData\Roaming\Python\Python311\site-packages\_pytest\faulthandler.py", line 102, in pytest_runtest_protocol
+    return (yield)
+            ^^^^^
+  File "C:\Users\alson\AppData\Roaming\Python\Python311\site-packages\pluggy\_callers.py", line 121, in _multicall
+    res = hook_impl.function(*args)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\alson\AppData\Roaming\Python\Python311\site-packages\_pytest\runner.py", line 118, in pytest_runtest_protocol
+    runtestprotocol(item, nextitem=nextitem)
+  File "C:\Users\alson\AppData\Roaming\Python\Python311\site-packages\_pytest\runner.py", line 137, in runtestprotocol
+    reports.append(call_and_report(item, "call", log))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\alson\AppData\Roaming\Python\Python311\site-packages\_pytest\runner.py", line 249, in call_and_report
+    report: TestReport = ihook.pytest_runtest_makereport(item=item, call=call)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\alson\AppData\Roaming\Python\Python311\site-packages\pluggy\_hooks.py", line 512, in __call__
+    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\alson\AppData\Roaming\Python\Python311\site-packages\pluggy\_manager.py", line 120, in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\alson\AppData\Roaming\Python\Python311\site-packages\pluggy\_callers.py", line 167, in _multicall
+    raise exception
+  File "C:\Users\alson\AppData\Roaming\Python\Python311\site-packages\pluggy\_callers.py", line 139, in _multicall
+    teardown.throw(exception)
+  File "C:\Users\alson\AppData\Roaming\Python\Python311\site-packages\_pytest\tmpdir.py", line 311, in pytest_runtest_makereport
+    rep = yield
+          ^^^^^
+  File "C:\Users\alson\AppData\Roaming\Python\Python311\site-packages\pluggy\_callers.py", line 139, in _multicall
+    teardown.throw(exception)
+  File "C:\Users\alson\AppData\Roaming\Python\Python311\site-packages\_pytest\skipping.py", line 280, in pytest_runtest_makereport
+    rep = yield
+          ^^^^^
+  File "C:\Users\alson\AppData\Roaming\Python\Python311\site-packages\pluggy\_callers.py", line 121, in _multicall
+    res = hook_impl.function(*args)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\alson\AppData\Roaming\Python\Python311\site-packages\_pytest\runner.py", line 377, in pytest_runtest_makereport
+    return TestReport.from_item_and_call(item, call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\alson\AppData\Roaming\Python\Python311\site-packages\_pytest\reports.py", line 438, in from_item_and_call
+    longrepr = _format_failed_longrepr(item, call, excinfo)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\alson\AppData\Roaming\Python\Python311\site-packages\_pytest\reports.py", line 263, in _format_failed_longrepr
+    longrepr = item.repr_failure(excinfo)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\alson\AppData\Roaming\Python\Python311\site-packages\_pytest\python.py", line 1762, in repr_failure
+    return self._repr_failure_py(excinfo, style=style)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\alson\AppData\Roaming\Python\Python311\site-packages\_pytest\nodes.py", line 456, in _repr_failure_py
+    return excinfo.getrepr(
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\alson\AppData\Roaming\Python\Python311\site-packages\_pytest\_code\code.py", line 765, in getrepr
+    return fmt.repr_excinfo(self)
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\alson\AppData\Roaming\Python\Python311\site-packages\_pytest\_code\code.py", line 1200, in repr_excinfo
+    reprtraceback = self.repr_traceback(excinfo_)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\alson\AppData\Roaming\Python\Python311\site-packages\_pytest\_code\code.py", line 1132, in repr_traceback
+    entries = [
+              ^
+  File "C:\Users\alson\AppData\Roaming\Python\Python311\site-packages\_pytest\_code\code.py", line 1133, in <listcomp>
+    self.repr_traceback_entry(entry, excinfo if last == entry else None)
+  File "C:\Users\alson\AppData\Roaming\Python\Python311\site-packages\_pytest\_code\code.py", line 1063, in repr_traceback_entry
+    source = self._getentrysource(entry)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\alson\AppData\Roaming\Python\Python311\site-packages\_pytest\_code\code.py", line 901, in _getentrysource
+    source = entry.getsource(self.astcache)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\alson\AppData\Roaming\Python\Python311\site-packages\_pytest\_code\code.py", line 299, in getsource
+    astnode, _, end = getstatementrange_ast(
+                      ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\alson\AppData\Roaming\Python\Python311\site-packages\_pytest\_code\source.py", line 191, in getstatementrange_ast
+  File "C:\Program Files\Python311\Lib\ast.py", line 50, in parse
+    return compile(source, filename, mode, flags,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyboardInterrupt
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "C:\Users\alson\AppData\Roaming\Python\Python311\site-packages\pytest\__main__.py", line 9, in <module>
+    raise SystemExit(pytest.console_main())
+                     ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\alson\AppData\Roaming\Python\Python311\site-packages\_pytest\config\__init__.py", line 223, in console_main
+    code = main()
+           ^^^^^^
+  File "C:\Users\alson\AppData\Roaming\Python\Python311\site-packages\_pytest\config\__init__.py", line 199, in main
+    ret: ExitCode | int = config.hook.pytest_cmdline_main(config=config)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\alson\AppData\Roaming\Python\Python311\site-packages\pluggy\_hooks.py", line 512, in __call__
+    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\alson\AppData\Roaming\Python\Python311\site-packages\pluggy\_manager.py", line 120, in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\alson\AppData\Roaming\Python\Python311\site-packages\pluggy\_callers.py", line 167, in _multicall
+    raise exception
+  File "C:\Users\alson\AppData\Roaming\Python\Python311\site-packages\pluggy\_callers.py", line 121, in _multicall
+    res = hook_impl.function(*args)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\alson\AppData\Roaming\Python\Python311\site-packages\_pytest\main.py", line 365, in pytest_cmdline_main
+    return wrap_session(config, _main)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\alson\AppData\Roaming\Python\Python311\site-packages\_pytest\main.py", line 332, in wrap_session
+    config.hook.pytest_keyboard_interrupt(excinfo=excinfo)
+  File "C:\Users\alson\AppData\Roaming\Python\Python311\site-packages\pluggy\_hooks.py", line 512, in __call__
+    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\alson\AppData\Roaming\Python\Python311\site-packages\pluggy\_manager.py", line 120, in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\alson\AppData\Roaming\Python\Python311\site-packages\pluggy\_callers.py", line 167, in _multicall
+    raise exception
+  File "C:\Users\alson\AppData\Roaming\Python\Python311\site-packages\pluggy\_callers.py", line 121, in _multicall
+    res = hook_impl.function(*args)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\alson\AppData\Roaming\Python\Python311\site-packages\_pytest\terminal.py", line 999, in pytest_keyboard_interrupt
+    self._keyboardinterrupt_memo = excinfo.getrepr(funcargs=True)
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\alson\AppData\Roaming\Python\Python311\site-packages\_pytest\_code\code.py", line 765, in getrepr
+    return fmt.repr_excinfo(self)
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\alson\AppData\Roaming\Python\Python311\site-packages\_pytest\_code\code.py", line 1200, in repr_excinfo
+    reprtraceback = self.repr_traceback(excinfo_)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\alson\AppData\Roaming\Python\Python311\site-packages\_pytest\_code\code.py", line 1132, in repr_traceback
+    entries = [
+              ^
+  File "C:\Users\alson\AppData\Roaming\Python\Python311\site-packages\_pytest\_code\code.py", line 1133, in <listcomp>
+    self.repr_traceback_entry(entry, excinfo if last == entry else None)
+  File "C:\Users\alson\AppData\Roaming\Python\Python311\site-packages\_pytest\_code\code.py", line 1063, in repr_traceback_entry
+    source = self._getentrysource(entry)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\alson\AppData\Roaming\Python\Python311\site-packages\_pytest\_code\code.py", line 901, in _getentrysource
+    source = entry.getsource(self.astcache)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\alson\AppData\Roaming\Python\Python311\site-packages\_pytest\_code\code.py", line 299, in getsource
+    astnode, _, end = getstatementrange_ast(
+                      ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\alson\AppData\Roaming\Python\Python311\site-packages\_pytest\_code\source.py", line 191, in getstatementrange_ast
+    astnode = ast.parse(content, "source", "exec")
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python311\Lib\ast.py", line 50, in parse
+    return compile(source, filename, mode, flags,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyboardInterrupt

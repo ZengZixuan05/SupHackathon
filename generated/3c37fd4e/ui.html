@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory Tracking System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body class="bg-gray-100">
+    <div id="root" class="p-6"></div>
+    <script type="text/babel">
+        const API_BASE_URL = '/live/3c37fd4e';
+
+        function App() {
+            const [items, setItems] = React.useState([]);
+            const [loading, setLoading] = React.useState(false);
+            const [error, setError] = React.useState(null);
+            const [newItem, setNewItem] = React.useState({ name: '', sku: '', quantity: 0 });
+            const [sellSku, setSellSku] = React.useState('');
+            const [sellAmount, setSellAmount] = React.useState(0);
+
+            const fetchItems = async () => {
+                setLoading(true);
+                setError(null);
+                try {
+                    const response = await fetch(`${API_BASE_URL}/items`);
+                    if (!response.ok) throw new Error('Failed to fetch items');
+                    const data = await response.json();
+                    setItems(data);
+                } catch (err) {
+                    setError(err.message);
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            const addItem = async () => {
+                setLoading(true);
+                setError(null);
+                try {
+                    const response = await fetch(`${API_BASE_URL}/items`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(newItem),
+                    });
+                    if (!response.ok) throw new Error('Failed to add item');
+                    await fetchItems();
+                    setNewItem({ name: '', sku: '', quantity: 0 });
+                } catch (err) {
+                    setError(err.message);
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            const sellItem = async () => {
+                setLoading(true);
+                setError(null);
+                try {
+                    const response = await fetch(`${API_BASE_URL}/items/${sellSku}/sell`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ amount: sellAmount }),
+                    });
+                    if (!response.ok) throw new Error('Failed to sell item');
+                    await fetchItems();
+                    setSellSku('');
+                    setSellAmount(0);
+                } catch (err) {
+                    setError(err.message);
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            React.useEffect(() => {
+                fetchItems();
+            }, []);
+
+            return (
+                <div>
+                    <h1 className="text-2xl font-bold mb-4">Inventory Tracking System</h1>
+                    {loading && <p>Loading...</p>}
+                    {error && <p className="text-red-500">{error}</p>}
+                    <div className="mb-4">
+                        <h2 className="text-xl">Add New Item</h2>
+                        <input
+                            type="text"
+                            placeholder="Name"
+                            value={newItem.name}
+                            onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
+                            className="border p-2 mr-2"
+                        />
+                        <input
+                            type="text"
+                            placeholder="SKU"
+                            value={newItem.sku}
+                            onChange={(e) => setNewItem({ ...newItem, sku: e.target.value })}
+                            className="border p-2 mr-2"
+                        />
+                        <input
+                            type="number"
+                            placeholder="Quantity"
+                            value={newItem.quantity}
+                            onChange={(e) => setNewItem({ ...newItem, quantity: parseInt(e.target.value) })}
+                            className="border p-2 mr-2"
+                        />
+                        <button onClick={addItem} className="bg-blue-500 text-white p-2">Add Item</button>
+                    </div>
+                    <div className="mb-4">
+                        <h2 className="text-xl">Sell Item</h2>
+                        <input
+                            type="text"
+                            placeholder="SKU"
+                            value={sellSku}
+                            onChange={(e) => setSellSku(e.target.value)}
+                            className="border p-2 mr-2"
+                        />
+                        <input
+                            type="number"
+                            placeholder="Amount"
+                            value={sellAmount}
+                            onChange={(e) => setSellAmount(parseInt(e.target.value))}
+                            className="border p-2 mr-2"
+                        />
+                        <button onClick={sellItem} className="bg-green-500 text-white p-2">Sell Item</button>
+                    </div>
+                    <h2 className="text-xl">Inventory Items</h2>
+                    <ul className="list-disc pl-5">
+                        {items.map((item, index) => (
+                            <li key={index} className="mb-2">{item.name} (SKU: {item.sku}, Quantity: {item.quantity})</li>
+                        ))}
+                    </ul>
+                </div>
+            );
+        }
+
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>

@@ -48,6 +48,10 @@ class PipelineState(BaseModel):
     status: PipelineStatus = PipelineStatus.PLANNING
     active_agent: AgentName | None = None
     history: List[AttemptRecord] = Field(default_factory=list)
+    event_log: List[str] = Field(default_factory=list)
 
     def add_attempt(self, attempt: AttemptRecord) -> None:
         self.history.append(attempt)
+
+    def add_event(self, message: str) -> None:
+        self.event_log.append(message)

@@ -1,0 +1,102 @@
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel, constr
+from typing import List
+import uuid
+
+app = FastAPI()
+
+store: dict[str, dict] = {}
+
+class UserRegister(BaseModel):
+    username: constr(min_length=3, max_length=30)
+    email: constr(pattern=r'^[\w\.-]+@[\w\.-]+\.\w+$')
+    password: constr(min_length=6)
+
+class UserLogin(BaseModel):
+    email: constr(pattern=r'^[\w\.-]+@[\w\.-]+\.\w+$')
+    password: constr(min_length=6)
+
+class CreatePost(BaseModel):
+    user_id: str
+    content: constr(min_length=1, max_length=1000)
+
+class CommentPost(BaseModel):
+    user_id: str
+    comment: constr(min_length=1, max_length=500)
+
+class FriendRequest(BaseModel):
+    user_id: str
+    friend_id: str
+
+class UserResponse(BaseModel):
+    message: str
+    user_id: str
+
+class PostResponse(BaseModel):
+    message: str
+    post_id: str
+
+class CommentResponse(BaseModel):
+    message: str
+    comment_id: str
+
+class FriendRequestResponse(BaseModel):
+    message: str
+
+class UserPostsResponse(BaseModel):
+    post_id: str
+    content: str
+    created_at: str
+
+@app.post("/api/users/register", response_model=UserResponse, status_code=201)
+def register_user(user: UserRegister):
+    if user.email in [u['email'] for u in store.values()] or any(u['username'] == user.username for u in store.values()):
+        raise HTTPException(status_code=409, detail="Email or username already exists")
+    
+    user_id = str(uuid.uuid4())
+    store[user_id] = {"username": user.username, "email": user.email, "password": user.password}
+    return {"message": "User registered successfully", "user_id": user_id}
+
+@app.post("/api/users/login", response_model=UserResponse)
+def login_user(user: UserLogin):
+    for user_id, user_data in store.items():
+        if user_data['email'] == user.email and user_data['password'] == user.password:
+            return {"message": "Login successful", "user_id": user_id}
+    raise HTTPException(status_code=401, detail="Invalid credentials")
+
+@app.post("/api/posts", response_model=PostResponse, status_code=201)
+def create_post(post: CreatePost):
+    if post.user_id not in store:
+        raise HTTPException(status_code=404, detail="User does not exist")
+    
+    post_id = str(uuid.uuid4())
+    store[post_id] = {"user_id": post.user_id, "content": post.content, "created_at": "now"}  # Placeholder for created_at
+    return {"message": "Post created successfully", "post_id": post_id}
+
+@app.get("/api/users/{user_id}/posts", response_model=List[UserPostsResponse])
+def get_user_posts(user_id: str):
+    if user_id not in store:
+        raise HTTPException(status_code=404, detail="User does not exist")
+    
+    user_posts = [post for post_id, post in store.items() if post.get('user_id') == user_id]
+    return [{"post_id": post_id, "content": post['content'], "created_at": post['created_at']} for post_id, post in user_posts]
+
+@app.post("/api/posts/{post_id}/comments", response_model=CommentResponse, status_code=201)
+def add_comment(post_id: str, comment: CommentPost):
+    if post_id not in store:
+        raise HTTPException(status_code=404, detail="Post does not exist")
+    
+    comment_id = str(uuid.uuid4())
+    store[comment_id] = {"post_id": post_id, "user_id": comment.user_id, "comment": comment.comment}
+    return {"message": "Comment added successfully", "comment_id": comment_id}
+
+@app.post("/api/friends/request", response_model=FriendRequestResponse)
+def send_friend_request(friend_request: FriendRequest):
+    if friend_request.user_id not in store or friend_request.friend_id not in store:
+        raise HTTPException(status_code=404, detail="User or friend does not exist")
+    
+    if friend_request.user_id == friend_request.friend_id:
+        raise HTTPException(status_code=400, detail="Cannot send friend request to oneself")
+    
+    # Placeholder for storing friend requests logic
+    return {"message": "Friend request sent successfully"}

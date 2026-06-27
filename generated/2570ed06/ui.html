@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facebook Replica Feature Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+</head>
+<body class="bg-gray-100 flex flex-col items-center py-10">
+    <div id="app" class="w-full max-w-md"></div>
+
+    <script type="text/babel">
+        const App = () => {
+            const [username, setUsername] = React.useState('');
+            const [email, setEmail] = React.useState('');
+            const [password, setPassword] = React.useState('');
+            const [userId, setUserId] = React.useState('');
+            const [content, setContent] = React.useState('');
+            const [postId, setPostId] = React.useState('');
+            const [comments, setComments] = React.useState([]);
+            const [friendId, setFriendId] = React.useState('');
+            const [message, setMessage] = React.useState('');
+            const [loading, setLoading] = React.useState(false);
+            const [error, setError] = React.useState('');
+
+            const handleRegister = async () => {
+                setLoading(true);
+                setError('');
+                try {
+                    const response = await fetch('/live/2570ed06/api/users/register', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username, email, password })
+                    });
+                    const data = await response.json();
+                    if (response.ok) {
+                        setUserId(data.user_id);
+                        setMessage(data.message);
+                    } else {
+                        throw new Error(data.detail[0].msg);
+                    }
+                } catch (err) {
+                    setError(err.message);
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            const handleLogin = async () => {
+                setLoading(true);
+                setError('');
+                try {
+                    const response = await fetch('/live/2570ed06/api/users/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, password })
+                    });
+                    const data = await response.json();
+                    if (response.ok) {
+                        setMessage(data.message);
+                    } else {
+                        throw new Error(data.detail[0].msg);
+                    }
+                } catch (err) {
+                    setError(err.message);
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            const handleCreatePost = async () => {
+                setLoading(true);
+                setError('');
+                try {
+                    const response = await fetch('/live/2570ed06/api/posts', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ user_id: userId, content })
+                    });
+                    const data = await response.json();
+                    if (response.ok) {
+                        setPostId(data.post_id);
+                        setMessage(data.message);
+                    } else {
+                        throw new Error(data.detail[0].msg);
+                    }
+                } catch (err) {
+                    setError(err.message);
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            const handleGetUserPosts = async () => {
+                setLoading(true);
+                setError('');
+                try {
+                    const response = await fetch(`/live/2570ed06/api/users/${userId}/posts`);
+                    const data = await response.json();
+                    if (response.ok) {
+                        setComments(data);
+                    } else {
+                        throw new Error(data.detail[0].msg);
+                    }
+                } catch (err) {
+                    setError(err.message);
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            const handleAddComment = async (post_id) => {
+                setLoading(true);
+                setError('');
+                try {
+                    const response = await fetch(`/live/2570ed06/api/posts/${post_id}/comments`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ user_id: userId, comment: content })
+                    });
+                    const data = await response.json();
+                    if (response.ok) {
+                        setMessage(data.message);
+                    } else {
+                        throw new Error(data.detail[0].msg);
+                    }
+                } catch (err) {
+                    setError(err.message);
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            const handleSendFriendRequest = async () => {
+                setLoading(true);
+                setError('');
+                try {
+                    const response = await fetch('/live/2570ed06/api/friends/request', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ user_id: userId, friend_id: friendId })
+                    });
+                    const data = await response.json();
+                    if (response.ok) {
+                        setMessage(data.message);
+                    } else {
+                        throw new Error(data.detail[0].msg);
+                    }
+                } catch (err) {
+                    setError(err.message);
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            return (
+                <div className="bg-white p-6 rounded-lg shadow-md">
+                    <h1 className="text-xl font-bold mb-4">Facebook Replica Feature Demo</h1>
+                    {loading && <p>Loading...</p>}
+                    {error && <p className="text-red-500">{error}</p>}
+                    {message && <p className="text-green-500">{message}</p>}
+                    <div className="mb-4">
+                        <h2 className="font-semibold">Register</h2>
+                        <input type="text" placeholder="Username" className="border p-2 mb-2 w-full" value={username} onChange={(e) => setUsername(e.target.value)} />
+                        <input type="email" placeholder="Email" className="border p-2 mb-2 w-full" value={email} onChange={(e) => setEmail(e.target.value)} />
+                        <input type="password" placeholder="Password" className="border p-2 mb-2 w-full" value={password} onChange={(e) => setPassword(e.target.value)} />
+                        <button className="bg-blue-500 text-white p-2 rounded" onClick={handleRegister}>Register</button>
+                    </div>
+                    <div className="mb-4">
+                        <h2 className="font-semibold">Login</h2>
+                        <input type="email" placeholder="Email" className="border p-2 mb-2 w-full" value={email} onChange={(e) => setEmail(e.target.value)} />
+                        <input type="password" placeholder="Password" className="border p-2 mb-2 w-full" value={password} onChange={(e) => setPassword(e.target.value)} />
+                        <button className="bg-blue-500 text-white p-2 rounded" onClick={handleLogin}>Login</button>
+                    </div>
+                    <div className="mb-4">
+                        <h2 className="font-semibold">Create Post</h2>
+                        <textarea placeholder="What's on your mind?" className="border p-2 mb-2 w-full" value={content} onChange={(e) => setContent(e.target.value)} />
+                        <button className="bg-blue-500 text-white p-2 rounded" onClick={handleCreatePost}>Post</button>
+                    </div>
+                    <div className="mb-4">
+                        <h2 className="font-semibold">Get User Posts</h2>
+                        <button className="bg-blue-500 text-white p-2 rounded" onClick={handleGetUserPosts}>Get Posts</button>
+                        <ul className="mt-2">
+                            {comments.map((post) => (
+                                <li key={post.post_id} className="border-b py-2">
+                                    <p>{post.content}</p>
+                                    <button className="text-blue-500" onClick={() => handleAddComment(post.post_id)}>Comment</button>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                    <div className="mb-4">
+                        <h2 className="font-semibold">Send Friend Request</h2>
+                        <input type="text" placeholder="Friend ID" className="border p-2 mb-2 w-full" value={friendId} onChange={(e) => setFriendId(e.target.value)} />
+                        <button className="bg-blue-500 text-white p-2 rounded" onClick={handleSendFriendRequest}>Send Request</button>
+                    </div>
+                </div>
+            );
+        };
+
+        ReactDOM.render(<App />, document.getElementById('app'));
+    </script>
+</body>
+</html>

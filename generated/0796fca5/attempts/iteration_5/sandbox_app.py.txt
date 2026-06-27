@@ -1,0 +1,90 @@
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel, EmailStr, constr
+from typing import List, Dict
+import uuid
+from datetime import datetime
+
+app = FastAPI()
+
+store: Dict[str, Dict] = {}
+
+class UserRegister(BaseModel):
+    username: constr(min_length=3, max_length=30)
+    email: EmailStr
+    password: constr(min_length=8)
+
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: constr(min_length=8)
+
+class PostCreate(BaseModel):
+    user_id: str
+    content: constr(max_length=1000)
+
+class PostResponse(BaseModel):
+    post_id: str
+    message: str
+
+class CommentCreate(BaseModel):
+    user_id: str
+    comment: constr(max_length=500)
+
+class CommentResponse(BaseModel):
+    comment_id: str
+    message: str
+
+class CommentsResponse(BaseModel):
+    comments: List[Dict[str, str]]
+
+class UserResponse(BaseModel):
+    user_id: str
+    message: str
+
+@app.post("/api/v1/users/register", response_model=UserResponse, status_code=201)
+def register_user(user: UserRegister):
+    if any(u['username'] == user.username or u['email'] == user.email for u in store.values()):
+        raise HTTPException(status_code=409, detail="Username or email already exists.")
+    
+    user_id = str(uuid.uuid4())
+    store[user_id] = {"username": user.username, "email": user.email, "password": user.password}
+    return {"user_id": user_id, "message": "User registered successfully."}
+
+@app.post("/api/v1/users/login", response_model=Dict[str, str])
+def login_user(user: UserLogin):
+    for user_id, u in store.items():
+        if u['email'] == user.email and u['password'] == user.password:
+            return {"token": str(uuid.uuid4()), "user_id": user_id}
+    raise HTTPException(status_code=401, detail="Invalid credentials.")
+
+@app.post("/api/v1/posts", response_model=PostResponse, status_code=201)
+def create_post(post: PostCreate):
+    if post.user_id not in store:
+        raise HTTPException(status_code=404, detail="User not found.")
+    
+    post_id = str(uuid.uuid4())
+    store[post_id] = {"user_id": post.user_id, "content": post.content, "created_at": datetime.utcnow().isoformat()}
+    return {"post_id": post_id, "message": "Post created successfully."}
+
+@app.get("/api/v1/users/{user_id}/posts", response_model=List[Dict[str, str]])
+def get_user_posts(user_id: str):
+    user_posts = [(post_id, post) for post_id, post in store.items() if post.get("user_id") == user_id]
+    if not user_posts:
+        raise HTTPException(status_code=404, detail="User not found.")
+    return [{"post_id": post_id, "content": post["content"], "created_at": post["created_at"]} for post_id, post in user_posts]
+
+@app.post("/api/v1/posts/{post_id}/comments", response_model=CommentResponse, status_code=201)
+def add_comment(post_id: str, comment: CommentCreate):
+    if post_id not in store:
+        raise HTTPException(status_code=404, detail="Post not found.")
+    
+    comment_id = str(uuid.uuid4())
+    store[comment_id] = {"post_id": post_id, "user_id": comment.user_id, "comment": comment.comment, "created_at": datetime.utcnow().isoformat()}
+    return {"comment_id": comment_id, "message": "Comment added successfully."}
+
+@app.get("/api/v1/posts/{post_id}/comments", response_model=CommentsResponse)
+def get_comments_for_post(post_id: str):
+    if post_id not in store:
+        raise HTTPException(status_code=404, detail="Post not found.")
+    
+    comments = [c for c in store.values() if c.get("post_id") == post_id]
+    return {"comments": comments}

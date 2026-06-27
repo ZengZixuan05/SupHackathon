@@ -1,5 +1,5 @@
 from app.agents.base import BaseAgent
-from app.agents.prompts import QA_SYSTEM_PROMPT, QA_USER_PROMPT
+from app.agents.prompts import QA_SYNC_USER_PROMPT, QA_SYSTEM_PROMPT, QA_USER_PROMPT
 from app.sandbox.executor import SandboxExecutor, SandboxResult
 
 
@@ -18,6 +18,25 @@ class QAAgent(BaseAgent):
             user=QA_USER_PROMPT.format(
                 feature_request=feature_request,
                 blueprint=blueprint,
+            ),
+            output_format="python",
+        )
+
+    def sync_tests(
+        self,
+        blueprint: str,
+        feature_request: str,
+        current_code: str,
+        test_logs: str = "",
+    ) -> str:
+        """Regenerate tests aligned with the current application code."""
+        return self._call_llm(
+            system=QA_SYSTEM_PROMPT,
+            user=QA_SYNC_USER_PROMPT.format(
+                feature_request=feature_request,
+                blueprint=blueprint,
+                current_code=current_code,
+                test_logs=test_logs or "None",
             ),
             output_format="python",
         )

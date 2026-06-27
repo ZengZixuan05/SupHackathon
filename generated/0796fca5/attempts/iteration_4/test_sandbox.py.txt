@@ -1,0 +1,137 @@
+import pytest
+from fastapi.testclient import TestClient
+from sandbox_app import app
+
+client = TestClient(app)
+
+@pytest.fixture(autouse=True)
+def clear_store():
+    import sandbox_app
+    if hasattr(sandbox_app, "store"):
+        sandbox_app.store.clear()
+    yield
+    if hasattr(sandbox_app, "store"):
+        sandbox_app.store.clear()
+
+def test_user_registration_success():
+    response = client.post("/api/v1/users/register", json={
+        "username": "testuser",
+        "email": "testuser@example.com",
+        "password": "password123"
+    })
+    assert response.status_code == 201
+    assert "user_id" in response.json()
+    assert response.json()["message"] == "User registered successfully."
+
+def test_user_registration_conflict():
+    client.post("/api/v1/users/register", json={
+        "username": "testuser",
+        "email": "testuser@example.com",
+        "password": "password123"
+    })
+    response = client.post("/api/v1/users/register", json={
+        "username": "testuser",
+        "email": "testuser@example.com",
+        "password": "password123"
+    })
+    assert response.status_code == 409
+    assert "detail" in response.json()
+
+def test_user_registration_invalid_email():
+    response = client.post("/api/v1/users/register", json={
+        "username": "testuser",
+        "email": "invalid-email",
+        "password": "password123"
+    })
+    assert response.status_code == 400
+    assert "detail" in response.json()
+
+def test_user_login_success():
+    client.post("/api/v1/users/register", json={
+        "username": "testuser",
+        "email": "testuser@example.com",
+        "password": "password123"
+    })
+    response = client.post("/api/v1/users/login", json={
+        "email": "testuser@example.com",
+        "password": "password123"
+    })
+    assert response.status_code == 200
+    assert "token" in response.json()
+    assert "user_id" in response.json()
+
+def test_user_login_invalid_credentials():
+    response = client.post("/api/v1/users/login", json={
+        "email": "nonexistent@example.com",
+        "password": "wrongpassword"
+    })
+    assert response.status_code == 401
+    assert "detail" in response.json()
+
+def test_create_post_success():
+    client.post("/api/v1/users/register", json={
+        "username": "testuser",
+        "email": "testuser@example.com",
+        "password": "password123"
+    })
+    response = client.post("/api/v1/posts", json={
+        "user_id": "testuser_id",
+        "content": "This is a test post."
+    })
+    assert response.status_code == 201
+    assert "post_id" in response.json()
+    assert response.json()["message"] == "Post created successfully."
+
+def test_create_post_user_not_found():
+    response = client.post("/api/v1/posts", json={
+        "user_id": "nonexistent_user_id",
+        "content": "This is a test post."
+    })
+    assert response.status_code == 404
+    assert "detail" in response.json()
+
+def test_get_user_posts_success():
+    client.post("/api/v1/users/register", json={
+        "username": "testuser",
+        "email": "testuser@example.com",
+        "password": "password123"
+    })
+    client.post("/api/v1/posts", json={
+        "user_id": "testuser_id",
+        "content": "This is a test post."
+    })
+    response = client.get("/api/v1/users/testuser_id/posts")
+    assert response.status_code == 200
+    assert isinstance(response.json(), list)
+
+def test_get_user_posts_not_found():
+    response = client.get("/api/v1/users/nonexistent_user_id/posts")
+    assert response.status_code == 404
+    assert "detail" in response.json()
+
+def test_add_comment_success():
+    client.post("/api/v1/users/register", json={
+        "username": "testuser",
+        "email": "testuser@example.com",
+        "password": "password123"
+    })
+    post_response = client.post("/api/v1/posts", json={
+        "user_id": "testuser_id",
+        "content": "This is a test post."
+    })
+    post_id = post_response.json()["post_id"]
+    response = client.post(f"/api/v1/posts/{post_id}/comments", json={
+        "user_id": "testuser_id",
+        "comment": "This is a test comment."
+    })
+    assert response.status_code == 201
+    assert "comment_id" in response.json()
+    assert response.json()["message"] == "Comment added successfully."
+
+def test_add_comment_post_not_found():
+    response = client.post("/api/v1/posts/nonexistent_post_id/comments", json={
+        "user_id": "testuser_id",
+        "comment": "This is a test comment."
+    })
+    assert response.status_code == 404
+    assert "detail" in response.json()

@@ -1,0 +1,143 @@
+import pytest
+from fastapi.testclient import TestClient
+from sandbox_app import app
+
+client = TestClient(app)
+
+@pytest.fixture(autouse=True)
+def clear_store():
+    import sandbox_app
+    if hasattr(sandbox_app, "store"):
+        sandbox_app.store.clear()
+    if hasattr(sandbox_app, "posts"):
+        sandbox_app.posts.clear()
+    yield
+    if hasattr(sandbox_app, "store"):
+        sandbox_app.store.clear()
+    if hasattr(sandbox_app, "posts"):
+        sandbox_app.posts.clear()
+
+def test_register_user_success():
+    response = client.post("/api/users/register", json={
+        "username": "testuser",
+        "email": "testuser@example.com",
+        "password": "password123"
+    })
+    assert response.status_code == 201
+    assert "id" in response.json()
+    assert response.json()["username"] == "testuser"
+    assert response.json()["email"] == "testuser@example.com"
+
+def test_register_user_existing_username():
+    client.post("/api/users/register", json={
+        "username": "testuser",
+        "email": "testuser@example.com",
+        "password": "password123"
+    })
+    response = client.post("/api/users/register", json={
+        "username": "testuser",
+        "email": "newuser@example.com",
+        "password": "password123"
+    })
+    assert response.status_code == 409
+    assert "detail" in response.json()
+
+def test_register_user_existing_email():
+    client.post("/api/users/register", json={
+        "username": "testuser",
+        "email": "testuser@example.com",
+        "password": "password123"
+    })
+    response = client.post("/api/users/register", json={
+        "username": "newuser",
+        "email": "testuser@example.com",
+        "password": "password123"
+    })
+    assert response.status_code == 409
+    assert "detail" in response.json()
+
+def test_login_user_success():
+    client.post("/api/users/register", json={
+        "username": "testuser",
+        "email": "testuser@example.com",
+        "password": "password123"
+    })
+    response = client.post("/api/users/login", json={
+        "email": "testuser@example.com",
+        "password": "password123"
+    })
+    assert response.status_code == 200
+    assert "token" in response.json()
+    assert "user_id" in response.json()
+
+def test_login_user_invalid_credentials():
+    response = client.post("/api/users/login", json={
+        "email": "invalid@example.com",
+        "password": "wrongpassword"
+    })
+    assert response.status_code == 401
+    assert "detail" in response.json()
+
+def test_create_post_success():
+    client.post("/api/users/register", json={
+        "username": "testuser",
+        "email": "testuser@example.com",
+        "password": "password123"
+    })
+    response = client.post("/api/posts", json={
+        "user_id": 1,
+        "content": "This is a test post."
+    })
+    assert response.status_code == 201
+    assert "post_id" in response.json()
+    assert response.json()["content"] == "This is a test post."
+
+def test_get_news_feed_success():
+    client.post("/api/users/register", json={
+        "username": "testuser",
+        "email": "testuser@example.com",
+        "password": "password123"
+    })
+    client.post("/api/posts", json={
+        "user_id": 1,
+        "content": "This is a test post."
+    })
+    response = client.get("/api/users/1/feed")
+    assert response.status_code == 200
+    assert isinstance(response.json()["posts"], list)
+    assert len(response.json()["posts"]) == 1
+
+def test_like_post_success():
+    client.post("/api/users/register", json={
+        "username": "testuser",
+        "email": "testuser@example.com",
+        "password": "password123"
+    })
+    post_response = client.post("/api/posts", json={
+        "user_id": 1,
+        "content": "This is a test post."
+    })
+    response = client.post(f"/api/posts/{post_response.json()['post_id']}/like", json={
+        "user_id": 1
+    })
+    assert response.status_code == 200
+    assert response.json()["post_id"] == post_response.json()["post_id"]
+    assert response.json()["likes_count"] == 1
+
+def test_comment_on_post_success():
+    client.post("/api/users/register", json={
+        "username": "testuser",
+        "email": "testuser@example.com",
+        "password": "password123"
+    })
+    post_response = client.post("/api/posts", json={
+        "user_id": 1,
+        "content": "This is a test post."
+    })
+    response = client.post(f"/api/posts/{post_response.json()['post_id']}/comments", json={
+        "user_id": 1,
+        "content": "This is a test comment."
+    })
+    assert response.status_code == 201
+    assert "comment_id" in response.json()
+    assert response.json()["content"] == "This is a test comment."

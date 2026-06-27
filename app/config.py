@@ -8,7 +8,7 @@ class Settings(BaseSettings):
 
     openai_api_key: str = ""
     openai_model: str = "gpt-4o-mini"
-    max_iterations: int = 5
+    max_iterations: int = 8
     generated_dir: Path = Path("generated")
 
 

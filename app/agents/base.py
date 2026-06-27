@@ -29,6 +29,7 @@ class BaseAgent:
     ) -> str:
         from app.agents.utils import extract_html, extract_python_code
 
+        logger.info("%s agent calling model %s for %s output", self.name, self._model, output_format)
         try:
             response = self._client.chat.completions.create(
                 model=self._model,
@@ -39,6 +40,7 @@ class BaseAgent:
                 temperature=temperature,
             )
             raw = response.choices[0].message.content or ""
+            logger.info("%s agent received %d chars from model", self.name, len(raw))
         except Exception as exc:
             logger.exception("%s agent LLM call failed", self.name)
             raise RuntimeError(f"{self.name} agent failed: {exc}") from exc

@@ -1,0 +1,45 @@
+=== STDOUT ===
+============================= test session starts =============================
+platform win32 -- Python 3.11.8, pytest-9.0.2, pluggy-1.6.0 -- C:\Program Files\Python311\python.exe
+rootdir: C:\Users\alson\AppData\Local\Temp\feature_pipeline_o33365_t
+plugins: anyio-4.13.0, asyncio-1.3.0, cov-7.1.0, mock-3.15.1
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 9 items
+
+test_sandbox.py::test_register_user_success PASSED                       [ 11%]
+test_sandbox.py::test_register_user_existing_username PASSED             [ 22%]
+test_sandbox.py::test_register_user_existing_email PASSED                [ 33%]
+test_sandbox.py::test_login_user_success PASSED                          [ 44%]
+test_sandbox.py::test_login_user_invalid_credentials PASSED              [ 55%]
+test_sandbox.py::test_create_post_success FAILED                         [ 66%]
+test_sandbox.py::test_get_news_feed_success FAILED                       [ 77%]
+test_sandbox.py::test_like_post_success FAILED                           [ 88%]
+test_sandbox.py::test_comment_on_post_success FAILED                     [100%]
+
+================================== FAILURES ===================================
+__________________________ test_create_post_success ___________________________
+test_sandbox.py:91: in test_create_post_success
+    assert response.status_code == 201
+E   assert 404 == 201
+E    +  where 404 = <Response [404 Not Found]>.status_code
+_________________________ test_get_news_feed_success __________________________
+test_sandbox.py:106: in test_get_news_feed_success
+    assert response.status_code == 200
+E   assert 404 == 200
+E    +  where 404 = <Response [404 Not Found]>.status_code
+___________________________ test_like_post_success ____________________________
+test_sandbox.py:120: in test_like_post_success
+    response = client.post(f"/api/posts/{post_response.json()['post_id']}/like", json={
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'post_id'
+________________________ test_comment_on_post_success _________________________
+test_sandbox.py:137: in test_comment_on_post_success
+    response = client.post(f"/api/posts/{post_response.json()['post_id']}/comments", json={
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'post_id'
+=========================== short test summary info ===========================
+FAILED test_sandbox.py::test_create_post_success - assert 404 == 201
+FAILED test_sandbox.py::test_get_news_feed_success - assert 404 == 200
+FAILED test_sandbox.py::test_like_post_success - KeyError: 'post_id'
+FAILED test_sandbox.py::test_comment_on_post_success - KeyError: 'post_id'
+========================= 4 failed, 5 passed in 0.42s =========================

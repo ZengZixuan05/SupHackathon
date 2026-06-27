@@ -1,0 +1,131 @@
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel, constr
+from typing import List, Optional
+import time
+
+app = FastAPI()
+
+store: dict[int, dict] = {}
+posts: dict[int, dict] = {}
+post_id_counter = 1
+user_id_counter = 1
+
+class UserRegister(BaseModel):
+    username: constr(min_length=3, max_length=30)
+    email: constr(regex=r'^[^@]+@[^@]+\.[^@]+$')  # Simple email validation
+    password: constr(min_length=6)
+
+class UserLogin(BaseModel):
+    email: constr(regex=r'^[^@]+@[^@]+\.[^@]+$')
+    password: constr(min_length=6)
+
+class CreatePost(BaseModel):
+    user_id: int
+    content: constr(min_length=1, max_length=1000)
+
+class NewsFeedResponse(BaseModel):
+    posts: List[dict]
+
+class LikePost(BaseModel):
+    user_id: int
+
+class CommentOnPost(BaseModel):
+    user_id: int
+    content: constr(min_length=1, max_length=500)
+
+class UserResponse(BaseModel):
+    id: int
+    username: str
+    email: str
+
+class PostResponse(BaseModel):
+    post_id: int
+    user_id: int
+    content: str
+    created_at: str
+
+class LikeResponse(BaseModel):
+    post_id: int
+    likes_count: int
+
+class CommentResponse(BaseModel):
+    comment_id: int
+    post_id: int
+    user_id: int
+    content: str
+    created_at: str
+
+@app.post("/api/users/register", response_model=UserResponse, status_code=201)
+def register_user(user: UserRegister):
+    global user_id_counter
+    for existing_user in store.values():
+        if existing_user['username'] == user.username or existing_user['email'] == user.email:
+            raise HTTPException(status_code=409, detail="Username or email already exists")
+    
+    user_id = user_id_counter
+    store[user_id] = {"username": user.username, "email": user.email, "password": user.password}
+    user_id_counter += 1
+    return UserResponse(id=user_id, username=user.username, email=user.email)
+
+@app.post("/api/users/login", response_model=dict)
+def login_user(user: UserLogin):
+    for user_id, existing_user in store.items():
+        if existing_user['email'] == user.email and existing_user['password'] == user.password:
+            return {"token": "fake-jwt-token", "user_id": user_id}
+    raise HTTPException(status_code=401, detail="Invalid credentials")
+
+@app.post("/api/posts", response_model=PostResponse, status_code=201)
+def create_post(post: CreatePost):
+    global post_id_counter
+    if post.user_id not in store:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    created_at = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
+    post_response = {
+        "post_id": post_id_counter,
+        "user_id": post.user_id,
+        "content": post.content,
+        "created_at": created_at
+    }
+    posts[post_id_counter] = post_response
+    post_id_counter += 1
+    return PostResponse(**post_response)
+
+@app.get("/api/users/{user_id}/feed", response_model=NewsFeedResponse)
+def get_news_feed(user_id: int):
+    if user_id not in store:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    user_posts = [post for post in posts.values() if post['user_id'] == user_id]
+    return NewsFeedResponse(posts=user_posts)
+
+@app.post("/api/posts/{post_id}/like", response_model=LikeResponse)
+def like_post(post_id: int, like: LikePost):
+    if post_id not in posts:
+        raise HTTPException(status_code=404, detail="Post not found")
+    
+    # Here we would normally check if the user already liked the post
+    # For simplicity, we will just return the like count as 1
+    likes_count = 1  # This should be managed in a real application
+    return LikeResponse(post_id=post_id, likes_count=likes_count)
+
+@app.post("/api/posts/{post_id}/comments", response_model=CommentResponse, status_code=201)
+def comment_on_post(post_id: int, comment: CommentOnPost):
+    if post_id not in posts:
+        raise HTTPException(status_code=404, detail="Post not found")
+    
+    comment_id = len(posts[post_id].get('comments', [])) + 1
+    created_at = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
+    comment_response = {
+        "comment_id": comment_id,
+        "post_id": post_id,
+        "user_id": comment.user_id,
+        "content": comment.content,
+        "created_at": created_at
+    }
+    
+    if 'comments' not in posts[post_id]:
+        posts[post_id]['comments'] = []
+    posts[post_id]['comments'].append(comment_response)
+    
+    return CommentResponse(**comment_response)

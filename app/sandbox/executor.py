@@ -2,6 +2,7 @@ import logging
 import subprocess
 import sys
 import tempfile
+import time
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -48,6 +49,8 @@ class SandboxExecutor:
         stdout = ""
         stderr = ""
         exit_code = 1
+        start = time.perf_counter()
+        logger.info("Running pytest sandbox in %s", workspace)
 
         try:
             result = subprocess.run(
@@ -71,7 +74,14 @@ class SandboxExecutor:
             exit_code = 1
             logger.exception("Subprocess execution failed")
 
+        duration = time.perf_counter() - start
         combined = self._combine_logs(stdout, stderr)
+        logger.info(
+            "pytest sandbox finished with exit code %s in %.2fs (%d log chars)",
+            exit_code,
+            duration,
+            len(combined),
+        )
         return SandboxResult(
             exit_code=exit_code,
             stdout=stdout,

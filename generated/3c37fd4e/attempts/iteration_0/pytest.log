@@ -1,0 +1,35 @@
+=== STDOUT ===
+============================= test session starts =============================
+platform win32 -- Python 3.11.8, pytest-9.0.2, pluggy-1.6.0 -- C:\Program Files\Python311\python.exe
+rootdir: C:\Users\alson\AppData\Local\Temp\feature_pipeline_hc4aid4j
+plugins: anyio-4.13.0, asyncio-1.3.0, cov-7.1.0, mock-3.15.1
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 11 items
+
+test_sandbox.py::test_add_item_success PASSED                            [  9%]
+test_sandbox.py::test_add_item_duplicate_sku PASSED                      [ 18%]
+test_sandbox.py::test_add_item_negative_quantity FAILED                  [ 27%]
+test_sandbox.py::test_list_items_empty PASSED                            [ 36%]
+test_sandbox.py::test_list_items_with_data PASSED                        [ 45%]
+test_sandbox.py::test_get_item_success PASSED                            [ 54%]
+test_sandbox.py::test_get_item_not_found PASSED                          [ 63%]
+test_sandbox.py::test_sell_item_success PASSED                           [ 72%]
+test_sandbox.py::test_sell_item_insufficient_stock PASSED                [ 81%]
+test_sandbox.py::test_sell_item_not_found PASSED                         [ 90%]
+test_sandbox.py::test_sell_item_invalid_amount FAILED                    [100%]
+
+================================== FAILURES ===================================
+_______________________ test_add_item_negative_quantity _______________________
+test_sandbox.py:33: in test_add_item_negative_quantity
+    assert response.status_code == 400
+E   assert 422 == 400
+E    +  where 422 = <Response [422 Unprocessable Entity]>.status_code
+________________________ test_sell_item_invalid_amount ________________________
+test_sandbox.py:83: in test_sell_item_invalid_amount
+    assert response.status_code == 400
+E   assert 422 == 400
+E    +  where 422 = <Response [422 Unprocessable Entity]>.status_code
+=========================== short test summary info ===========================
+FAILED test_sandbox.py::test_add_item_negative_quantity - assert 422 == 400
+FAILED test_sandbox.py::test_sell_item_invalid_amount - assert 422 == 400
+========================= 2 failed, 9 passed in 0.60s =========================

@@ -7,6 +7,7 @@ from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, Field
 
 from app.deploy.loader import mount_generated_app, registry
+from app.homepage import HOME_PAGE_HTML
 from app.models.state import AgentName, AttemptRecord, PipelineState, PipelineStatus
 from app.orchestrator.pipeline import FeaturePipeline
 
@@ -15,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI(
     title="Autonomous Feature Pipeline",
-    description="Multi-agent system: PM → Coder → QA (self-correcting loop) → Frontend → Deploy",
+    description="Multi-agent system: PM to Coder to QA to Frontend to Deploy",
     version="0.2.0",
 )
 
@@ -45,6 +46,7 @@ class GenerateFeatureResponse(BaseModel):
     live_ui_path: str | None
     test_logs: str
     history: List[AttemptRecord]
+    event_log: List[str]
 
 
 class DeploymentSummary(BaseModel):
@@ -66,123 +68,7 @@ def remount_saved_deployments() -> None:
 
 @app.get("/", response_class=HTMLResponse)
 def root() -> str:
-    return """<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Autonomous Feature Pipeline</title>
-  <style>
-    * { box-sizing: border-box; }
-    body { font-family: system-ui, sans-serif; max-width: 860px; margin: 2rem auto; padding: 0 1rem; color: #1a1a1a; }
-    h1 { font-size: 1.5rem; }
-    .pipeline { display: flex; gap: 0.5rem; margin: 1rem 0; flex-wrap: wrap; }
-    .agent { padding: 0.4rem 0.8rem; border-radius: 999px; background: #f4f4f5; font-size: 0.85rem; }
-    .agent.active { background: #2563eb; color: #fff; }
-    textarea { width: 100%; min-height: 120px; padding: 0.75rem; font: inherit; border: 1px solid #ccc; border-radius: 6px; }
-    button { margin-top: 0.75rem; padding: 0.6rem 1.2rem; font: inherit; background: #2563eb; color: #fff; border: none; border-radius: 6px; cursor: pointer; margin-right: 0.5rem; }
-    button:disabled { opacity: 0.6; cursor: wait; }
-    button.secondary { background: #71717a; }
-    pre { background: #f4f4f5; padding: 1rem; border-radius: 6px; overflow: auto; font-size: 0.82rem; white-space: pre-wrap; max-height: 400px; }
-    .links { margin-top: 1.5rem; font-size: 0.9rem; }
-    .links a { margin-right: 1rem; }
-    #status { margin-top: 1rem; font-weight: 600; }
-    #deploy-links { margin-top: 0.75rem; }
-    #deploy-links a { display: inline-block; margin-right: 1rem; color: #2563eb; }
-    .section { margin-top: 1.5rem; }
-    .section h2 { font-size: 1rem; margin-bottom: 0.5rem; }
-  </style>
-</head>
-<body>
-  <h1>Autonomous Feature Pipeline</h1>
-  <p>Multi-agent system: PM plans → Coder writes → QA tests → self-corrects → Frontend deploys.</p>
-
-  <div class="pipeline">
-    <span class="agent" id="a-pm">1. PM Agent</span>
-    <span class="agent" id="a-coder">2. Coder Agent</span>
-    <span class="agent" id="a-qa">3. QA Agent</span>
-    <span class="agent" id="a-fe">4. Frontend Agent</span>
-  </div>
-
-  <textarea id="feature" placeholder="Describe a feature or paste markdown spec..."></textarea>
-  <br>
-  <button id="run">Run Pipeline</button>
-  <button class="secondary" id="load-example">Load Example Spec</button>
-  <p id="status"></p>
-  <div id="deploy-links"></div>
-
-  <div class="section" id="blueprint-section" hidden>
-    <h2>Technical Blueprint (PM Agent)</h2>
-    <pre id="blueprint"></pre>
-  </div>
-  <div class="section" id="output-section" hidden>
-    <h2>Pipeline Result</h2>
-    <pre id="output"></pre>
-  </div>
-
-  <div class="links">
-    <a href="/docs">Orchestrator API docs</a>
-    <a href="/deployments">Deployments</a>
-    <a href="/health">Health</a>
-  </div>
-
-  <script>
-    const agents = { pm: "a-pm", coder: "a-coder", qa: "a-qa", frontend: "a-fe" };
-    function setActiveAgent(name) {
-      Object.values(agents).forEach(id => document.getElementById(id).classList.remove("active"));
-      if (name && agents[name]) document.getElementById(agents[name]).classList.add("active");
-    }
-
-    document.getElementById("load-example").addEventListener("click", async () => {
-      const res = await fetch("/specs/example");
-      document.getElementById("feature").value = await res.text();
-    });
-
-    document.getElementById("run").addEventListener("click", async () => {
-      const text = document.getElementById("feature").value.trim();
-      if (text.length < 10) { alert("Please enter at least 10 characters."); return; }
-      const btn = document.getElementById("run");
-      btn.disabled = true;
-      setActiveAgent("pm");
-      document.getElementById("status").textContent = "PM Agent planning…";
-      document.getElementById("deploy-links").innerHTML = "";
-      document.getElementById("blueprint-section").hidden = true;
-      document.getElementById("output-section").hidden = true;
-
-      try {
-        const res = await fetch("/generate-feature", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ feature_request: text }),
-        });
-        const data = await res.json();
-        setActiveAgent(data.active_agent);
-        document.getElementById("status").textContent =
-          "Status: " + data.status + " | Iterations: " + data.iteration_count;
-
-        if (data.technical_blueprint) {
-          document.getElementById("blueprint").textContent = data.technical_blueprint;
-          document.getElementById("blueprint-section").hidden = false;
-        }
-
-        if (data.status === "success") {
-          setActiveAgent("frontend");
-          document.getElementById("deploy-links").innerHTML =
-            '<a href="' + data.live_api_path + '/docs" target="_blank">Live Swagger UI</a>' +
-            '<a href="' + data.live_ui_path + '" target="_blank">Generated React UI</a>';
-        }
-
-        document.getElementById("output").textContent = JSON.stringify(data, null, 2);
-        document.getElementById("output-section").hidden = false;
-      } catch (e) {
-        document.getElementById("status").textContent = "Request failed.";
-      } finally {
-        btn.disabled = false;
-      }
-    });
-  </script>
-</body>
-</html>"""
+    return HOME_PAGE_HTML
 
 
 @app.get("/favicon.ico", include_in_schema=False)
@@ -256,4 +142,5 @@ def generate_feature(body: GenerateFeatureRequest) -> GenerateFeatureResponse:
         live_ui_path=state.live_ui_path,
         test_logs=state.test_logs,
         history=state.history,
+        event_log=state.event_log,
     )
